@@ -1,0 +1,19 @@
+services:
+  nginx:
+    build: ./requirements/nginx/
+
+    image: nginx:1.24.0
+
+    container_name: NGINX
+
+    ports:
+      - "443:443"
+
+
+        # wordpress:
+        #   build:
+        #   expose: "9000"
+        #   volumes:
+        #     - tools/ # un truc comme ca
+
+        #mariadb:

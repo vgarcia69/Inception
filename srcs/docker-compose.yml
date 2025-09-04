@@ -7,12 +7,11 @@ services:
 
     container_name: NGINX
 
-    volumes:                                         # a enlever
-      - ./requirements/nginx/:/usr/share/nginx/html/ # a enlever
-
+    networks:
+      - inception
     ports:
       - "443:443"
-      - "8080:80"
+
 # comment link le port 9000 a nginx ?
 
 # comment link le port 3306 a wp ?
@@ -21,33 +20,28 @@ services:
 
       container_name: MARIADB
 
-      image:lscr.io/linuxserver/mariadb:latest            # a changer
-
+      networks:
+        - inception
       environment:
-        - MARIADB_ROOT_PASSWORD=ROOT_ACCESS_PASSWORD      # a voir dans les secrets
-        - MARIADB_PASSWORD=ACCESS_PASSWORD
-        - MARIADB_USER=USER                               # il faut deux utilisateur
-        - MARIADB_DATABASE=PATH_TO_DATABASE
+        - .env
 
       volumes:
         - ./requirements/mariadb/config:/config
 
-      expose: "3306"
-
-
   wordpress:
       build: ./requirements/wordpress/
-
-      image: wordpress:latest                              # a changer
-      expose: "9000"
 
       container_name: WORDPRESS
 
       depends_on:
         - mariadb
-
+      environment:
+        - .env
       volumes:
-        - ./requirements/wordpress/wp-template/:/var/www/html/     # site web volume
-        - ./requirements/wordpress/database/:var/lib/mariadb/       # database volume
+        - ./requirements/wordpress/:/var/lib/mariadb/       # database volume     a voir pour le mettre dans home/vgarcia/ y a un bail comme ca
+      networks:
+        - inception
 
-  network:
+networks:
+  inception:
+    driver: bridge            # qlq chose comme ca pour setup le network

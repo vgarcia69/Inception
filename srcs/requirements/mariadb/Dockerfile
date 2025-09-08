@@ -6,6 +6,6 @@ COPY . .
 
 EXPOSE 3306
 
-RUN chmod +x ./script.sh
+RUN chmod +x script.sh
 
-ENTRYPOINT ["./script.sh"]
+ENTRYPOINT ["script.sh"]

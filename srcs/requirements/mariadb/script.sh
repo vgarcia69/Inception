@@ -4,5 +4,4 @@
 # set -a
 # source srcs/.env    
 
-
-mysql -u root -p $MARIADB_ADMIN_PASSWD
+# mysql -u root -p $MARIADB_ADMIN_PASSWD

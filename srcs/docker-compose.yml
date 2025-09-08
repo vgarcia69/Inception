@@ -28,19 +28,19 @@ services:
       volumes:
         - ./requirements/mariadb/config:/config
 
-  wordpress:
-      build: ./requirements/wordpress/
+  # wordpress:
+  #     build: ./requirements/wordpress/
 
-      container_name: WORDPRESS
+  #     container_name: WORDPRESS
 
-      depends_on:
-        - mariadb
-      environment:
-        - .env
-      volumes:
-        - ./requirements/wordpress/:/var/lib/mariadb/       # database volume     a voir pour le mettre dans home/vgarcia/ y a un bail comme ca
-      networks:
-        - inception
+  #     depends_on:
+  #       - mariadb
+  #     environment:
+  #       - .env
+  #     volumes:
+  #       - ./requirements/wordpress/:/var/lib/mariadb/       # database volume     a voir pour le mettre dans home/vgarcia/ y a un bail comme ca
+  #     networks:
+  #       - inception
 
 networks:
   inception:

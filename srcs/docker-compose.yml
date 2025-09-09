@@ -30,6 +30,7 @@ services:
 
       volumes:
         - ./requirements/mariadb/config:/config
+        # - ./requirements/mariadb/:/var/lib/mysql/  
 
   # wordpress:
   #     build: ./requirements/wordpress/
@@ -41,7 +42,7 @@ services:
   #     environment:
   #       - .env
   #     volumes:
-  #       - ./requirements/wordpress/:/var/lib/mariadb/       # database volume     a voir pour le mettre dans home/vgarcia/ y a un bail comme ca
+  #       - ./requirements/wordpress/:/var/lib/mysql/       # database volume     a voir pour le mettre dans home/vgarcia/ y a un bail comme ca
   #     networks:
   #       - inception
 

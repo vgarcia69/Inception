@@ -1,11 +1,16 @@
 FROM debian:11
 
-RUN apt update && apt upgrade -y && apt install -y mariadb-server sudo
+RUN apt update && apt upgrade -y && apt install -y mariadb-server gettext
 
-COPY init.sql /docker-entrypoint-initdb.d/
-COPY script.sh /docker-entrypoint-initdb.d/
+RUN mkdir /run/mysqld /var/lib/mysql &&\ 
+	chown -R mysql:mysql /run/mysqld /var/lib/mysql
 
-RUN chmod +x /docker-entrypoint-initdb.d/script.sh
-RUN chmod +x /docker-entrypoint-initdb.d/init.sql
+COPY init.sql /
+COPY script.sh /
+
+RUN chmod +x /script.sh
+RUN chmod +x /init.sql
 
 EXPOSE 3306
+
+ENTRYPOINT ["/script.sh"]

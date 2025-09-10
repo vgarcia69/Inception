@@ -2,18 +2,25 @@
 
 set -e
 
-# #log in the admin user
-# exec mysql -u root -p $MARIADB_ADMIN_PASSWD
+if [ ! -d "/var/lib/mysql/mysql" ]; then
+    mysql_install_db --user=mysql --datadir=/var/lib/mysql
+fi
 
+mysqld_safe --user=mysql &
 
+until mysqladmin ping >/dev/null; do
+    sleep 1
+done
 
-envsubst < /init.sql > /tmp/init_tmp.sql
+mysql -u root << EOF
+CREATE DATABASE IF NOT EXISTS ${DATABASE_NAME};
+CREATE USER IF NOT EXISTS '${MARIADB_USER}'@'localhost' IDENTIFIED BY '${MARIADB_PASSWD}';
+CREATE USER IF NOT EXISTS '${MARIADB_ADMIN}'@'localhost' IDENTIFIED BY '${MARIADB_ADMIN_PASSWD}';
+GRANT ALL PRIVILEGES ON ${DATABASE_NAME}.* TO '${MARIADB_ADMIN}'@'localhost';
+ALTER USER 'root'@'localhost' IDENTIFIED BY ${MARIADB_ADMIN_PASSWD};
+FLUSH PRIVILEGES;
+EOF
 
-chmod +x /tmp/init_tmp.sql
+mysqladmin -u root shutdown
 
-
-
-mysqld --user=mysql --datadir=/var/lib/mysql --socket=/run/mysqld/mysqld.sock
-
-
-mysql -u root -p ${MARIADB_ROOT_PASSWD} < /tmp/init_tmp.sql
+exec mysqld --user=mysql --datadir=/var/lib/mysql

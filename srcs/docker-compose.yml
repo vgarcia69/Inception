@@ -28,9 +28,11 @@ services:
       env_file:
         - .env
 
+      ports:
+        - "3306:3306"
+
       volumes:
-        - ./requirements/mariadb/config:/config
-        # - ./requirements/mariadb/:/var/lib/mysql/  
+        - ./requirements/mariadb/config:/var/lib/mysql/
 
   # wordpress:
   #     build: ./requirements/wordpress/
@@ -48,4 +50,4 @@ services:
 
 networks:
   inception:
-    driver: bridge            # qlq chose comme ca pour setup le network
+    driver: bridge

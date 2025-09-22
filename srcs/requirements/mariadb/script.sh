@@ -3,16 +3,18 @@
 set -e
 
 if [ ! -d "/var/lib/mysql/mysql" ]; then
-    mysql_install_db --user=mysql --datadir=/var/lib/mysql
+    mysql_install_db --user=mysql --datadir=/var/lib/mysql --socket=/run/mysqld/mysqld.sock 
 fi
 
-mysqld_safe --user=mysql &
+mysqld_safe --user=mysql --pid-file=/run/mysqld/mysqld.pid &
 
-until mysqladmin ping >/dev/null; do
+until mysqladmin ping >/dev/null 2>&1; do
     sleep 1
 done
 
-mysql -u root -e << EOF
+mysql -u root << EOF
+
+CREATE DATABASE IF NOT EXISTS ${DATABASE_NAME};
 
 CREATE USER IF NOT EXISTS '${MARIADB_USER}'@'localhost' IDENTIFIED BY "${MARIADB_PASSWD}";
 CREATE USER IF NOT EXISTS '${MARIADB_USER}'@'%' IDENTIFIED BY "${MARIADB_PASSWD}";
@@ -20,24 +22,22 @@ CREATE USER IF NOT EXISTS '${MARIADB_USER}'@'%' IDENTIFIED BY "${MARIADB_PASSWD}
 CREATE USER IF NOT EXISTS '${MARIADB_ADMIN}'@'%' IDENTIFIED BY "${MARIADB_ADMIN_PASSWD}";
 CREATE USER IF NOT EXISTS '${MARIADB_ADMIN}'@'localhost' IDENTIFIED BY "${MARIADB_ADMIN_PASSWD}";
 
-GRANT ALL PRIVILEGES ON *.* TO  '${MARIADB_ADMIN}'@'localhost';
-GRANT ALL PRIVILEGES ON *.* TO  '${MARIADB_ADMIN}'@'%';
+GRANT ALL PRIVILEGES ON *.* TO '${MARIADB_ADMIN}'@'localhost' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON *.* TO '${MARIADB_ADMIN}'@'%' WITH GRANT OPTION;
 
+GRANT ALL PRIVILEGES ON '${DATABASE_NAME}'.* TO '${MARIADB_USER}'@'localhost';
+GRANT ALL PRIVILEGES ON '${DATABASE_NAME}'.* TO '${MARIADB_USER}'@'%';
 
-ALTER USER 'root'@'localhost' IDENTIFIED VIA mysql_native_password USING PASSWORD('${MARIADB_ADMIN_PASSWD}');
-ALTER USER '${MARIADB_ADMIN}'@'localhost' IDENTIFIED BY "${MARIADB_ADMIN_PASSWD}";
-ALTER USER '${MARIADB_ADMIN}'@'%' IDENTIFIED BY "${MARIADB_ADMIN_PASSWD}";
-
-GRANT ALL PRIVILEGES ON `${DATABASE_NAME}`.* TO '${MARIADB_USER}'@'%';
-CREATE DATABASE IF NOT EXISTS ${DATABASE_NAME};
+ALTER USER 'root'@'localhost' IDENTIFIED BY '${MARIADB_ADMIN_PASSWD}';
 
 DELETE FROM mysql.user WHERE User='';
+DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
 DROP DATABASE IF EXISTS test;
-DELETE FROM mysql.db WHERE Db='test' OR Db LIKE 'test%';
+DELETE FROM mysql.db WHERE Db='test' OR Db='test_%';
 FLUSH PRIVILEGES;
 
 EOF
 
-mysqladmin -u root -p ${MARIADB_ADMIN_PASSWD} shutdown
+mysqladmin -u ${MARIADB_ADMIN} -p${MARIADB_ADMIN_PASSWD} shutdown
 
-exec mysqld --user=mysql --datadir=/var/lib/mysql
+exec mysqld --user=mysql --datadir=/var/lib/mysql 

@@ -34,24 +34,24 @@ services:
       volumes:
         - mariadb_data:/var/lib/mysql
 
-  # wordpress:
-  #     build: ./requirements/wordpress/
+  wordpress:
+      build: ./requirements/wordpress/
 
-  #     container_name: WORDPRESS
+      container_name: WORDPRESS
 
-  #     depends_on:
-  #       - mariadb
+      depends_on:
+        - mariadb
 
-  #     env_file:
-  #       - .env
+      env_file:
+        - .env
 
-  #     restart: unless-stopped
+      restart: unless-stopped
 
-  #     volumes:
-  #       - ./requirements/wordpress/:/var/www/html
+      volumes:
+        - ./requirements/wordpress/:/var/www/html
 
-  #     networks:
-  #       - inception
+      networks:
+        - inception
 
 networks:
   inception:

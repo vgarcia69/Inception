@@ -2,15 +2,25 @@
 
 set -e
 
-if [ ! -d "/var/lib/mysql/mysql" ]; then
-    mysql_install_db --user=mysql --datadir=/var/lib/mysql --socket=/run/mysqld/mysqld.sock 
-fi
+rm -rf /var/lib/apt/lists/* && rm -rf /var/lib/mysql/*
+
+echo "Installing DataBase"
+mysql_install_db --user=mysql --datadir=/var/lib/mysql --basedir=/usr
+
+mkdir -p /run/mysqld
+chown -R mysql:mysql /var/lib/mysql
+chown -R mysql:mysql /run/mysqld
+chmod 755 /run/mysqld
 
 mysqld_safe --user=mysql --pid-file=/run/mysqld/mysqld.pid &
+MYSQLD_PID=$!
 
 until mysqladmin ping >/dev/null 2>&1; do
+    echo "Wait for init to be done"
     sleep 1
 done
+
+echo "Starting configuration"
 
 mysql -u root << EOF
 
@@ -25,8 +35,8 @@ CREATE USER IF NOT EXISTS '${MARIADB_ADMIN}'@'localhost' IDENTIFIED BY "${MARIAD
 GRANT ALL PRIVILEGES ON *.* TO '${MARIADB_ADMIN}'@'localhost' WITH GRANT OPTION;
 GRANT ALL PRIVILEGES ON *.* TO '${MARIADB_ADMIN}'@'%' WITH GRANT OPTION;
 
-GRANT ALL PRIVILEGES ON '${DATABASE_NAME}'.* TO '${MARIADB_USER}'@'localhost';
-GRANT ALL PRIVILEGES ON '${DATABASE_NAME}'.* TO '${MARIADB_USER}'@'%';
+GRANT ALL PRIVILEGES ON ${DATABASE_NAME}.* TO '${MARIADB_USER}'@'localhost';
+GRANT ALL PRIVILEGES ON ${DATABASE_NAME}.* TO '${MARIADB_USER}'@'%';
 
 ALTER USER 'root'@'localhost' IDENTIFIED BY '${MARIADB_ADMIN_PASSWD}';
 
@@ -34,9 +44,12 @@ DELETE FROM mysql.user WHERE User='';
 DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
 DROP DATABASE IF EXISTS test;
 DELETE FROM mysql.db WHERE Db='test' OR Db='test_%';
+
 FLUSH PRIVILEGES;
 
 EOF
+
+echo "Initialisation Done"
 
 mysqladmin -u ${MARIADB_ADMIN} -p${MARIADB_ADMIN_PASSWD} shutdown
 

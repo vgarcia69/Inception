@@ -1,20 +1,11 @@
 [mysqld]
-
-user                    = mysql
-port                    = 3306
-bind-address            = localhost
-database                = /var/lib/mysql
-pid-file                = /run/mysqld/mysqld.pid
-basedir                 = /usr
-datadir                 = /var/lib/mysql
-tmpdir                  = /tmp
-lc-messages-dir         = /usr/share/mysql
-lc-messages             = en_US
-skip-external-locking
-character-set-server  = utf8mb4
-collation-server      = utf8mb4_general_ci
-
 socket = /run/mysqld/mysqld.sock
+pid-file = /run/mysqld/mysqld.pid
+bind-address = 0.0.0.0
+port = 3306
+datadir = /var/lib/mysql
+skip-networking = false
+skip-name-resolve
 
 [mysql]
 socket = /run/mysqld/mysqld.sock
@@ -24,3 +15,4 @@ socket = /run/mysqld/mysqld.sock
 
 [client]
 socket = /run/mysqld/mysqld.sock
+port = 3306

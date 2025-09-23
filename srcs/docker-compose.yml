@@ -9,6 +9,7 @@ services:
 
     networks:
       - inception
+
     ports:
       - "443:443"
 
@@ -25,6 +26,8 @@ services:
       env_file:
         - .env
 
+      restart: unless-stopped
+        
       ports:
         - "3306:3306"
 
@@ -38,10 +41,15 @@ services:
 
   #     depends_on:
   #       - mariadb
-  #     environment:
+
+  #     env_file:
   #       - .env
+
+  #     restart: unless-stopped
+
   #     volumes:
-  #       - ./requirements/wordpress/:/var/lib/mysql/       # database volume     a voir pour le mettre dans home/vgarcia/ y a un bail comme ca
+  #       - ./requirements/wordpress/:/var/www/html
+
   #     networks:
   #       - inception
 
@@ -52,3 +60,4 @@ networks:
 volumes:
   mariadb_data:
     driver: local
+

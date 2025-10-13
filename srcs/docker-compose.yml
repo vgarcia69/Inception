@@ -10,6 +10,8 @@ services:
     networks:
       - inception
 
+    restart: unless-stopped
+
     ports:
       - "443:443"
 

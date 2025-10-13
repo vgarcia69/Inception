@@ -1,6 +1,10 @@
+#!/bin/bash
 
-# curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+set -e
 
-# php wp-cli.phar --info
+echo "html suppressed"
 
-# chmod +x wp-cli.phar
+
+
+
+echo "wordpress moved"

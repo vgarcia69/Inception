@@ -4,6 +4,8 @@ SRCDIR=srcs/
 
 all: build up
 
+re: clean build up
+
 down:
 	@echo "Shutting down $(NAME)"
 	docker compose -p $(NAME) down
@@ -23,4 +25,4 @@ clean:
 	docker compose -p $(NAME) --project-directory $(SRCDIR) down -v --remove-orphans
 	docker system prune -af --volumes
 
-.PHONY: clean up build down all
+.PHONY: clean up build down all re

@@ -9,4 +9,6 @@ COPY conf /etc/php/7.4/fpm/pool.d/www.conf
 
 RUN chmod +x ./script.sh
 
+EXPOSE 9000
+
 ENTRYPOINT ["./script.sh"]

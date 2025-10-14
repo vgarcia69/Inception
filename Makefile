@@ -1,5 +1,5 @@
 NAME=inception
-DBPATH=/home/vince/data/mariadb
+DBPATH=/home/vgarcia/data/
 SRCDIR=srcs/
 
 all: build up
@@ -15,11 +15,12 @@ build:
 
 up: 
 	@echo "Starting $(NAME)"
-	docker compose --project-directory $(SRCDIR) -p $(NAME) up -d
+	docker compose --project-directory $(SRCDIR) -p $(NAME) up 
 
-clean: down
+clean:
 	@echo "Cleaning $(NAME)"
 	@rm -rf $(DBPATH)
+	docker compose -p $(NAME) --project-directory $(SRCDIR) down -v --remove-orphans
 	docker system prune -af --volumes
 
 .PHONY: clean up build down all

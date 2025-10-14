@@ -4,6 +4,6 @@ RUN apt update && apt upgrade -y && apt install -y nginx
 
 COPY . /etc/nginx/
 
-EXPOSE 443
+EXPOSE 8080
 
 CMD ["nginx", "-g", "daemon off;"]

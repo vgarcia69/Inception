@@ -5,7 +5,7 @@ set -e
 rm -rf /var/lib/apt/lists/* && rm -rf /var/lib/mysql/*
 
 echo "Installing DataBase"
-mysql_install_db --user=mysql --datadir=/var/lib/mysql --basedir=/usr
+mysql_install_db --user=mysql --datadir=${MARIADB_PATH} --basedir=/usr
 
 mkdir -p /run/mysqld
 chown -R mysql:mysql /var/lib/mysql
@@ -53,4 +53,4 @@ echo "Initialisation Done"
 
 mysqladmin -u ${MARIADB_ADMIN} -p${MARIADB_ADMIN_PASSWD} shutdown
 
-exec mysqld --user=mysql --datadir=/var/lib/mysql 
+exec mysqld --user=mysql --datadir=${MARIADB_PATH}

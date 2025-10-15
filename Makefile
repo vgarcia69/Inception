@@ -13,6 +13,9 @@ down:
 build:
 	@echo "Building $(NAME)"
 	@mkdir -p $(DBPATH)
+	@mkdir -p $(DBPATH)/wordpress
+	@mkdir -p $(DBPATH)/mariadb
+	@chmod 777 $(DBPATH)/wordpress $(DBPATH)/mariadb
 	docker compose --project-directory $(SRCDIR) -p $(NAME) build
 
 up: 

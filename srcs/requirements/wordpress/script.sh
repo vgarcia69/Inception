@@ -9,7 +9,7 @@ curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.pha
 chmod +x wp-cli.phar
 mv wp-cli.phar /usr/local/bin/wp
 
-sleep 5
+sleep 7
 
 wp core download --path=$WP_PATH --allow-root
 
@@ -20,15 +20,13 @@ wp config create --allow-root \
     --dbhost=$DBHOST \
     --path=$WP_PATH
 
-
-wp core install \
+wp core install --allow-root \
     --url=https://$DOMAIN_NAME \
     --title=$TITLE \
     --admin_user=$MARIADB_ADMIN \
     --admin_password=$MARIADB_ADMIN_PASSWD \
     --path=$WP_PATH  \
-    --admin_email="admin@example.com" \
-    --allow-root
+    --admin_email=$WP_MAIL
 
 chown -R www-data:www-data $WP_PATH
 

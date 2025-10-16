@@ -2,32 +2,52 @@
 
 set -e
 
-mkdir -p $WP_PATH
+# mettre un gros if then pour voir si deja cree et pareil sleep 7 mettre while loop
 
-curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+if [ ! -d /usr/local/bin/wp/wp-cli.phar ]; then
 
-chmod +x wp-cli.phar
-mv wp-cli.phar /usr/local/bin/wp
+    echo "installing wp-client"
+    curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 
-sleep 7
+    chmod +x wp-cli.phar
+    mv wp-cli.phar /usr/local/bin/wp
 
-wp core download --path=$WP_PATH --allow-root
+fi
 
-wp config create --allow-root \
-    --dbname=$DATABASE_NAME \
-    --dbuser=$MARIADB_USER \
-    --dbpass=$MARIADB_PASSWD \
-    --dbhost=$DBHOST \
-    --path=$WP_PATH
+until netcat -z "$DBHOST" 3306; do
+    echo "Waiting for MariaDB port 3306..." # a voir si besoin de plus ?
+    sleep 1
+done
 
-wp core install --allow-root \
-    --url=https://$DOMAIN_NAME \
-    --title=$TITLE \
-    --admin_user=$MARIADB_ADMIN \
-    --admin_password=$MARIADB_ADMIN_PASSWD \
-    --path=$WP_PATH  \
-    --admin_email=$WP_MAIL
+if [ ! -f "$WP_PATH/wp-config.php" ]; then
 
-chown -R www-data:www-data $WP_PATH
+    echo "Building config"
+    wp core download --path=$WP_PATH --allow-root
 
-exec php-fpm7.4 -F
+    wp config create --allow-root \
+        --dbname=$DATABASE_NAME \
+        --dbuser=$MARIADB_USER \
+        --dbpass=$MARIADB_PASSWD \
+        --dbhost=$DBHOST \
+        --path=$WP_PATH
+
+    wp core install --allow-root \
+        --url=https://$DOMAIN_NAME \
+        --title=$TITLE \
+        --admin_user=$MARIADB_ADMIN \
+        --admin_password=$MARIADB_ADMIN_PASSWD \
+        --path=$WP_PATH  \
+        --admin_email=$WP_MAIL
+
+    wp user create --allow-root --role=author \
+        $MARIADB_USER \
+        login@example.fr \
+        --user_pass=$MARIADB_PASSWD \
+        --path=$WP_PATH
+
+    chown -R www-data:www-data $WP_PATH
+else
+    echo "Config already existing"
+fi
+
+exec php-fpm8.2 -F

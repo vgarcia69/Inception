@@ -20,7 +20,7 @@ build:
 
 up: 
 	@echo "Starting $(NAME)"
-	docker compose --project-directory $(SRCDIR) -p $(NAME) up 
+	docker compose --project-directory $(SRCDIR) -p $(NAME) up -d
 
 clean:
 	@echo "Cleaning $(NAME)"

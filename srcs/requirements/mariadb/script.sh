@@ -9,6 +9,7 @@ chmod 755 /run/mysqld
 
 if [ ! -d "/var/lib/mysql/$DATABASE_NAME" ]; then
     echo "Installing DataBase"
+
     mysql_install_db --user=mysql --datadir=${MARIADB_PATH} --basedir=/usr
 
     mysqld_safe --user=mysql --pid-file=/run/mysqld/mysqld.pid &
@@ -18,7 +19,6 @@ if [ ! -d "/var/lib/mysql/$DATABASE_NAME" ]; then
         echo "Wait for init to be done"
         sleep 1
     done
-
 
     echo "Starting configuration"
 

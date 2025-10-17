@@ -2,8 +2,6 @@
 
 set -e
 
-# mettre un gros if then pour voir si deja cree et pareil sleep 7 mettre while loop
-
 if [ ! -d /usr/local/bin/wp/wp-cli.phar ]; then
 
     echo "installing wp-client"
@@ -14,10 +12,19 @@ if [ ! -d /usr/local/bin/wp/wp-cli.phar ]; then
 
 fi
 
+set +e
+
+i=0
 until netcat -z "$DBHOST" 3306; do
-    echo "Waiting for MariaDB port 3306..." # a voir si besoin de plus ?
+    if [ $i == 10 ]; then
+        exit 1
+    fi
+    echo "Waiting for MariaDB port 3306..."
     sleep 1
+    let i++
 done
+
+set -e
 
 if [ ! -f "$WP_PATH/wp-config.php" ]; then
 
@@ -37,11 +44,11 @@ if [ ! -f "$WP_PATH/wp-config.php" ]; then
         --admin_user=$MARIADB_ADMIN \
         --admin_password=$MARIADB_ADMIN_PASSWD \
         --path=$WP_PATH  \
-        --admin_email=$WP_MAIL
+        --admin_email=$WP_MAIL_ADMIN
 
     wp user create --allow-root --role=author \
         $MARIADB_USER \
-        login@example.fr \
+        $WP_MAIL \
         --user_pass=$MARIADB_PASSWD \
         --path=$WP_PATH
 

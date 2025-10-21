@@ -45,6 +45,8 @@ services:
   wordpress:
       build: ./requirements/wordpress/
 
+      image: wordpress
+      
       container_name: WORDPRESS
 
       networks:

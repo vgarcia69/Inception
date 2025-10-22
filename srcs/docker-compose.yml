@@ -8,7 +8,7 @@ services:
     container_name: NGINX
 
     networks:
-      - inception
+      - nginx-wp
 
     restart: unless-stopped
 
@@ -29,16 +29,13 @@ services:
       container_name: MARIADB
 
       networks:
-        - inception
+        - db-wp
 
       env_file:
         - .env
 
       restart: unless-stopped
         
-      ports:
-        - "3306:3306"
-
       volumes:
         - mariadb_data:/var/lib/mysql
 
@@ -50,7 +47,8 @@ services:
       container_name: WORDPRESS
 
       networks:
-        - inception
+        - nginx-wp
+        - db-wp
 
       depends_on:
         - mariadb
@@ -60,14 +58,15 @@ services:
 
       restart: unless-stopped
 
-      ports:
-        - "9000:9000"
       volumes:
         - wp_data:/var/www/html
 
 networks:
-  inception:
+  nginx-wp:
     driver: bridge
+  db-wp:
+    driver: bridge
+
 
 volumes:
   mariadb_data:
